@@ -81,6 +81,13 @@ rbenv_execute "run api setup" do
   group   node.applications[:user]
 end
 
+# Create puma config
+#
+template "#{node.applications[:dir]}/#{node.applications[:api][:name]}/puma.rb" do
+  source "pickwick-api.puma.erb"
+  owner node.applications[:user] and group node.applications[:user] and mode 0755
+end
+
 bash "restart application" do
   code "monit restart #{node.applications[:api][:name]}-puma"
   only_if { node.applications[:api][:current_revision] != node.applications[:api][:previous_revision] }

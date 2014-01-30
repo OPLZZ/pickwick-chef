@@ -24,6 +24,9 @@ server {
     proxy_redirect off;
     proxy_max_temp_file_size 0;
 
+    access_log <%= "#{node.applications[:dir]}/#{node.applications[:api][:name]}" %>/log/nginx.access.log;
+    error_log  <%= "#{node.applications[:dir]}/#{node.applications[:api][:name]}" %>/log/nginx.error.log info;
+
     # If the file exists as a static file serve it directly
     if (-f $request_filename) {
       break;
