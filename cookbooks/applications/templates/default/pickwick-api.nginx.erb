@@ -1,0 +1,38 @@
+upstream <%= node.applications[:api][:name] %> {
+  server unix:<%= node.applications[:api][:puma][:directories][:sockets] %>/<%= node.applications[:api][:name] %>.sock;
+}
+
+server {
+  listen 80;
+  server_name <%= node.applications[:api][:url] %>;
+
+  root <%= "#{node.applications[:dir]}/#{node.applications[:api][:name]}" %>/public;
+
+  location / {
+
+    if ($request_uri ~* "\.(ico|css|js|gif|jpe?g|png)\?[0-9]+$") {
+        expires max;
+        break;
+    }
+
+    # needed to forward user's IP address
+    proxy_set_header  X-Real-IP  $remote_addr;
+
+    # needed for HTTPS
+    proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_max_temp_file_size 0;
+
+    # If the file exists as a static file serve it directly
+    if (-f $request_filename) {
+      break;
+    }
+
+    # Pass request to Puma
+    if (!-f $request_filename) {
+      proxy_pass http://<%= node.applications[:api][:name] %>;
+      break;
+    }
+  }
+}

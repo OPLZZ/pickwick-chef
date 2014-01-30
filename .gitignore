@@ -1,0 +1,14 @@
+.DS_Store
+tmp/
+log/
+
+Gemfile.lock
+.vagrant
+
+.chef/*
+!.chef/.gitignore
+!.chef/tmp/.gitignore
+!.chef/bootstrap
+
+site-cookbooks/*
+!site-cookbooks/.gitignore
