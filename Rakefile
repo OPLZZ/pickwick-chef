@@ -1,5 +1,7 @@
 require 'json'
 
+task :default => 'chef:sync'
+
 namespace :chef do
   desc "Synchronize all resources (cookbooks, roles, etc.)"
   task :sync do
