@@ -78,6 +78,16 @@ rbenv_execute "workers bundle install" do
   end
 end
 
+bash "restart sidekiq" do
+  code "monit restart #{node.applications[:workers][:name]}-sidekiq"
+  only_if { node.applications[:workers][:current_revision] != node.applications[:workers][:previous_revision] }
+end
+
+bash "restart sidekiq web" do
+  code "monit restart #{node.applications[:workers][:name]}-puma"
+  only_if { node.applications[:workers][:current_revision] != node.applications[:workers][:previous_revision] }
+end
+
 # Create nginx config
 #
 template "#{node.nginx[:dir]}/conf.d/#{node.applications[:workers][:name]}.conf" do
