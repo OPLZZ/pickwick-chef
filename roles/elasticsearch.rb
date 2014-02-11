@@ -9,7 +9,8 @@ run_list    "role[base]",
             "recipe[elasticsearch::proxy]",
             "recipe[monitoring]",
             "recipe[monitoring::nginx]",
-            "recipe[monitoring::elasticsearch]"
+            "recipe[monitoring::elasticsearch]",
+            "recipe[applications::hunspell]"
 
 attributes = {
   java: {
