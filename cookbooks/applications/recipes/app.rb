@@ -20,7 +20,7 @@ ruby_block "Download and unpack APP from github latest release" do
     require 'uri'
     require 'net/http'
     #fix url for request
-    main_repo_url = default.applications[:app][:repository].gsub(".git", "")
+    main_repo_url = node.applications[:app][:repository].gsub(".git", "")
 
     #add to url latest releases
     latest_release_url = URI("#{main_repo_url}/releases/latest")
