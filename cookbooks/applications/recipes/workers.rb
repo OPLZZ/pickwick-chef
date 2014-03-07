@@ -1,3 +1,8 @@
+
+# Install ruby for workes
+#
+include_recipe "applications::ruby"
+
 # Load the GitChanged extension
 #
 [Chef::Recipe, Chef::Resource].each { |l| l.send :include, GitChanged }
