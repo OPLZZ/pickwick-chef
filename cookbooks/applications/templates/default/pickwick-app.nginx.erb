@@ -6,12 +6,21 @@ server {
   root <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/public;
   client_max_body_size 500M;
 
-  location / {
+  access_log <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.access.log;
+  error_log  <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.error.log info;
+
+  location ~ /assets/ {
+    include  /etc/nginx/mime.types;
 
     if ($request_uri ~* "\.(ico|css|js|gif|jpe?g|png|eot|svg|ttf|woff)\?[0-9]+$") {
         expires max;
         break;
     }
+
+    rewrite  ^.*/(assets/.*)$  /$1 break;
+  }
+
+  location / {
 
     # needed to forward user's IP address
     proxy_set_header  X-Real-IP  $remote_addr;
@@ -22,13 +31,8 @@ server {
     proxy_redirect off;
     proxy_max_temp_file_size 0;
 
-    access_log <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.access.log;
-    error_log  <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.error.log info;
-
-    # If the file exists as a static file serve it directly
-    if (-f $request_filename) {
-      break;
-    }
+    # Pass request to ember index page
+    try_files $uri /index.html;
 
   }
 }
