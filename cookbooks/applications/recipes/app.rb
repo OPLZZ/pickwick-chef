@@ -17,31 +17,30 @@ end
 
 ruby_block "Download and unpack APP from github latest release" do
   block do
-    require 'uri'
-    require 'net/http'
     #fix url for request
     main_repo_url = node.applications[:app][:repository].gsub(".git", "")
 
+    puts main_repo_url
     #add to url latest releases
-    latest_release_url = URI("#{main_repo_url}/releases/latest")
+    latest_release_url = "#{main_repo_url}/releases/latest"
+
+    puts latest_release_url
 
     #find latest tag name
-    latest_tag = Net::HTTP.get_response(latest_release_url)['Location'].split("tag/").last
+    request = `curl --head #{latest_release_url}`
+    latest_tag = request.split("\n").find{|l| l.include?("Location")}.split("tag/").last.strip
 
-    #build url for latest release
-    asset_url = URI("#{main_repo_url}/releases/download/#{latest_tag}/release.tar.gz")
+    #build url for latest relse
+    asset_url = "#{main_repo_url}/releases/download/#{latest_tag}/release.tar.gz"
 
-    #ask for exact location of file
-    asset_location_url = Net::HTTP.get_response(asset_url)['Location']
-
-    #writing asset data to temp file
+    #get asset data to temp file
     tmp_file = "/tmp/release_#{latest_tag}.tar.gz"
-    File.open(tmp_file, "wb") do |fw|
-      fw.write(Net::HTTP.get(URI(asset_location_url)))
-    end
+    `curl -L -o #{tmp_file} #{asset_url}`
 
     #unpacking file to main directory #{node.applications[:dir]}/#{node.applications[:app][:name]}/
     latest_release_dir = "#{node.applications[:dir]}/#{node.applications[:app][:name]}/release_#{latest_tag}"
+    `mkdir #{latest_release_dir}`
+
     `tar -xzf #{tmp_file} -C #{latest_release_dir}`
 
     #delete old symlink to previous latest version
