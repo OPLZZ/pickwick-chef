@@ -9,5 +9,3 @@ namespace :chef do
     sh  "bundle exec knife role from file roles/*.rb"
   end
 end
-
-end
