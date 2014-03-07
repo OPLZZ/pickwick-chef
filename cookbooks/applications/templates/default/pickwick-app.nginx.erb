@@ -1,0 +1,34 @@
+
+server {
+  listen 80;
+  server_name <%= node.applications[:app][:url] %>;
+
+  root <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/public;
+  client_max_body_size 500M;
+
+  location / {
+
+    if ($request_uri ~* "\.(ico|css|js|gif|jpe?g|png|eot|svg|ttf|woff)\?[0-9]+$") {
+        expires max;
+        break;
+    }
+
+    # needed to forward user's IP address
+    proxy_set_header  X-Real-IP  $remote_addr;
+
+    # needed for HTTPS
+    proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_max_temp_file_size 0;
+
+    access_log <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.access.log;
+    error_log  <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.error.log info;
+
+    # If the file exists as a static file serve it directly
+    if (-f $request_filename) {
+      break;
+    }
+
+  }
+}
