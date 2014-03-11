@@ -98,6 +98,14 @@ bash "restart application" do
   only_if { node.applications[:api][:current_revision] != node.applications[:api][:previous_revision] }
 end
 
+# Create default nginx config
+#
+template "#{node.nginx[:dir]}/conf.d/default.conf" do
+  source "default_nginx.conf.erb"
+  owner node.nginx[:user] and group node.nginx[:user] and mode 0755
+  notifies :reload, 'service[nginx]'
+end
+
 # Create nginx config
 #
 template "#{node.nginx[:dir]}/conf.d/#{node.applications[:api][:name]}.conf" do

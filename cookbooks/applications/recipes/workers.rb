@@ -93,6 +93,14 @@ bash "restart sidekiq web" do
   only_if { node.applications[:workers][:current_revision] != node.applications[:workers][:previous_revision] }
 end
 
+# Create default nginx config
+#
+template "#{node.nginx[:dir]}/conf.d/default.conf" do
+  source "default_nginx.conf.erb"
+  owner node.nginx[:user] and group node.nginx[:user] and mode 0755
+  notifies :reload, 'service[nginx]'
+end
+
 # Create nginx config
 #
 template "#{node.nginx[:dir]}/conf.d/#{node.applications[:workers][:name]}.conf" do

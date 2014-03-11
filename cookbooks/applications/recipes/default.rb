@@ -31,14 +31,6 @@ end
 
 include_recipe "elasticsearch::nginx"
 
-# Create default nginx config
-#
-template "#{node.nginx[:dir]}/conf.d/default.conf" do
-  source "default_nginx.conf.erb"
-  owner node.nginx[:user] and group node.nginx[:user] and mode 0755
-  notifies :reload, 'service[nginx]'
-end
-
 directory "#{node.applications[:dir]}/.ssh" do
   owner node.applications[:user] and group node.applications[:user] and mode 0700
   recursive true
