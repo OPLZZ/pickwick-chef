@@ -11,8 +11,8 @@ Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 # Get api ip from Chef
 #
 if (api_node = (search(:node, "role:api")).first rescue nil)
-  url   = api_node.applications[:api][:url] rescue nil
-  token = api_node.applications[:api][:consumer_token] rescue nil
+  url   = api_node.applications[:api][:url].split(" ").first rescue nil
+  token = api_node.applications[:api][:consumer_token]       rescue nil
 
   node.set[:applications][:workers][:api][:url]   = url   if url
   node.set[:applications][:workers][:api][:token] = token if token
