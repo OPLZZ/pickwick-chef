@@ -1,0 +1,13 @@
+check process <%= node.applications[:validator][:name] %>-fuseki with pidfile <%= node.applications[:dir] %>/<%= node.applications[:validator][:name] %>/tmp/pids/fuseki.pid
+  start program = "/bin/su - <%= node.applications[:user] %> -c 'cd <%= node.applications[:dir] %>/<%= node.applications[:validator][:name] %> && RUBY_GC_MALLOC_LIMIT=<%= node.applications[:ruby_gc_malloc_limit] %> bundle exec rake validator:fuseki:init'"
+  stop program = "/bin/su - <%= node.applications[:user] %> -c 'cd <%= node.applications[:dir] %>/<%= node.applications[:validator][:name] %> && RUBY_GC_MALLOC_LIMIT=<%= node.applications[:ruby_gc_malloc_limit] %> bundle exec rake validator:fuseki:stop'"
+  if totalmem > 95% for 15 cycles then restart
+
+check process <%= node.applications[:validator][:name] %>-puma with pidfile <%= node.applications[:validator][:puma][:directories][:pids] %>/<%= node.applications[:validator][:name] %>.pid
+  start program = "/bin/su - <%= node.applications[:user] %> -c 'cd <%= node.applications[:dir] %>/<%= node.applications[:validator][:name] %> && RUBY_GC_MALLOC_LIMIT=<%= node.applications[:ruby_gc_malloc_limit] %> bundle exec puma --config puma.rb'" with timeout <%= node.applications[:validator][:puma][:wait] %> seconds
+  stop program = "/bin/su - <%= node.applications[:user] %> -c 'kill -9 `cat <%= node.applications[:validator][:puma][:directories][:pids] %>/<%= node.applications[:validator][:name] %>.pid` && rm <%= node.applications[:validator][:puma][:directories][:pids] %>/<%= node.applications[:validator][:name] %>.pid'"
+
+  if totalmem > 95% for 15 cycles then restart
+
+  depends on <%= node.applications[:validator][:name] %>-fuseki
+  group <%= node.applications[:validator][:name] %>_puma

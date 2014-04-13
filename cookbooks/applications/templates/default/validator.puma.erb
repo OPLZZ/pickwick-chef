@@ -1,0 +1,17 @@
+#!/usr/bin/env puma
+
+environment '<%= node.applications[:validator][:environment] %>'
+
+daemonize true
+
+pidfile '<%= node.applications[:validator][:puma][:directories][:pids] %>/<%= node.applications[:validator][:name] %>.pid'
+
+stdout_redirect '<%= node.applications[:dir] %>/<%= node.applications[:validator][:name] %>/log/stderr.log',
+                '<%= node.applications[:dir] %>/<%= node.applications[:validator][:name] %>/log/stdout.log',
+                true
+
+threads <%= node.applications[:validator][:puma][:threads][:min] %>, <%= node.applications[:validator][:puma][:threads][:max] %>
+
+bind 'unix://<%= node.applications[:validator][:puma][:directories][:sockets] %>/<%= node.applications[:validator][:name] %>.sock'
+
+workers 1
