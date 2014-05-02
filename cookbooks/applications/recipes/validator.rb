@@ -81,6 +81,16 @@ rbenv_execute "import background data" do
   not_if { File.exists?("#{node.applications[:dir]}/#{node.applications[:validator][:name]}/vendor/jena-fuseki-#{node.applications[:validator][:fuseki][:version]}/fuseki") }
 end
 
+# Compile assets
+#
+rbenv_execute "compile assets" do
+  command "bundle exec rake assets:precompile RAILS_ENV=production"
+
+  cwd     "#{node.applications[:dir]}/#{node.applications[:validator][:name]}"
+  user    node.applications[:user]
+  group   node.applications[:user]
+end
+
 # Create puma config
 #
 template "#{node.applications[:dir]}/#{node.applications[:validator][:name]}/puma.rb" do
