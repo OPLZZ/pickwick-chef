@@ -71,6 +71,14 @@ rbenv_execute "install fuseki server" do
   not_if { File.exists?("#{node.applications[:dir]}/#{node.applications[:validator][:name]}/vendor/jena-fuseki-#{node.applications[:validator][:fuseki][:version]}/fuseki") }
 end
 
+rbenv_execute "stop fuseki server" do
+  command "bundle exec rake validator:fuseki:stop"
+
+  cwd     "#{node.applications[:dir]}/#{node.applications[:validator][:name]}"
+  user    node.applications[:user]
+  group   node.applications[:user]
+end
+
 rbenv_execute "import background data" do
   command "bundle exec rake validator:data:import_background_data"
 
@@ -79,6 +87,14 @@ rbenv_execute "import background data" do
   group   node.applications[:user]
 
   not_if { File.exists?("#{node.applications[:dir]}/#{node.applications[:validator][:name]}/vendor/jena-fuseki-#{node.applications[:validator][:fuseki][:version]}/fuseki") }
+end
+
+rbenv_execute "start fuseki server" do
+  command "bundle exec rake validator:fuseki:init"
+
+  cwd     "#{node.applications[:dir]}/#{node.applications[:validator][:name]}"
+  user    node.applications[:user]
+  group   node.applications[:user]
 end
 
 # Compile assets
