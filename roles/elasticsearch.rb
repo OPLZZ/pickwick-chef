@@ -18,7 +18,7 @@ attributes = {
     jdk_version:    "7"
   },
   elasticsearch: {
-    version:      "1.0.0.RC1",
+    version:      "1.0.1",
     cluster_name: "pickwick-api",
     plugins:      { "karmi/elasticsearch-paramedic" => {} },
     nginx: {
