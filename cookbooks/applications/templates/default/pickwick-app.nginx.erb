@@ -1,26 +1,29 @@
+upstream <%= node.applications[:app][:name] %> {
+  server unix:<%= node.applications[:app][:puma][:directories][:sockets] %>/<%= node.applications[:app][:name] %>.sock;
+}
 
+
+<%- unless node.applications[:app][:url].start_with?("www") -%>
 server {
   listen 80;
   server_name <%= node.applications[:app][:url] %>;
+  return 301 http://www.<%= node.applications[:app][:url] %>$request_uri;
+}
+<%- end -%>
+
+server {
+  listen 80;
+  server_name <%= "www." unless node.applications[:app][:url].start_with?("www") %><%= node.applications[:app][:url] %>;
 
   root <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/public;
   client_max_body_size 500M;
 
-  access_log <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.access.log;
-  error_log  <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.error.log info;
+  location / {
 
-  location ~ /assets/ {
-    include  /etc/nginx/mime.types;
-
-    if ($request_uri ~* "\.(ico|css|js|gif|jpe?g|png|eot|svg|ttf|woff)\?[0-9]+$") {
+    if ($request_uri ~* "\.(ico|css|js|gif|jpe?g|png)\?[0-9]+$") {
         expires max;
         break;
     }
-
-    rewrite  ^.*/(assets/.*)$  /$1 break;
-  }
-
-  location / {
 
     # needed to forward user's IP address
     proxy_set_header  X-Real-IP  $remote_addr;
@@ -31,8 +34,18 @@ server {
     proxy_redirect off;
     proxy_max_temp_file_size 0;
 
-    # Pass request to ember index page
-    try_files $uri /index.html;
+    access_log <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.access.log;
+    error_log  <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/log/nginx.error.log info;
 
+    # If the file exists as a static file serve it directly
+    if (-f $request_filename) {
+      break;
+    }
+
+    # Pass request to Puma
+    if (!-f $request_filename) {
+      proxy_pass http://<%= node.applications[:app][:name] %>;
+      break;
+    }
   }
 }

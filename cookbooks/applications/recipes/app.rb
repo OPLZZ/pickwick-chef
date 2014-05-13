@@ -1,62 +1,98 @@
-
-
-# Create App directory
+# Install ruby for application
 #
-directory "#{node.applications[:dir]}/#{node.applications[:app][:name]}" do
-  owner node.applications[:user] and group node.applications[:user] and mode 0775
-  recursive true
+include_recipe "applications::ruby"
+
+["sqlite3", "libsqlite3-dev", "libcurl4-openssl-dev"].each do |pkg|
+  package pkg
 end
 
-# Create App log directory
+# Load the GitChanged extension
 #
-directory "#{node.applications[:dir]}/#{node.applications[:app][:name]}/log" do
-  owner node.applications[:user] and group node.applications[:user] and mode 0775
-  recursive true
+[Chef::Recipe, Chef::Resource].each { |l| l.send :include, GitChanged }
+
+# Store current revision as "previous_revision"
+#
+ruby_block "save previous revision" do
+  block { node.set[:applications][:app][:previous_revision] = current_revision_sha(:app) }
 end
 
+bash "disable strict host checking for Github" do
+  user node.applications[:user]
+  code <<-EOS
+    echo -e "host github.com\n\tUser git\n\tPort 22\n\t\n\tStrictHostKeyChecking no\n" >> #{node.applications[:dir]}/.ssh/config
+  EOS
+  not_if { File.read("#{node.applications[:dir]}/.ssh/config").include?("github.com") rescue nil }
+end
 
-ruby_block "Download and unpack APP from github latest release" do
-  block do
-    #fix url for request
-    main_repo_url = node.applications[:app][:repository].gsub(".git", "")
+# Clone the repository
+#
+git "app" do
+  repository    node.applications[:app][:repository]
+  revision      node.applications[:app][:revision]
+  destination   "#{node.applications[:dir]}/#{node.applications[:app][:name]}"
+  user          node.applications[:user]
+  group         node.applications[:user]
+  action        :sync
+end
 
-    puts main_repo_url
-    #add to url latest releases
-    latest_release_url = "#{main_repo_url}/releases/latest"
+# Save current revision to node
+#
+ruby_block "save current revision" do
+  block { node.set[:applications][:app][:current_revision] = current_revision_sha(:app) }
+end
 
-    puts latest_release_url
+# Create directories for puma
+#
+node.applications[:app][:puma][:directories].values.each do |path|
 
-    #find latest tag name
-    request = `curl --head #{latest_release_url}`
-    latest_tag = request.split("\n").find{|l| l.include?("Location")}.split("tag/").last.strip
+  directory path do
+    owner node.applications[:user] and group node.applications[:user] and mode 0755
+    action :create
+    recursive true
+  end
 
-    #build url for latest relse
-    asset_url = "#{main_repo_url}/releases/download/#{latest_tag}/release.tar.gz"
+end
 
-    #get asset data to temp file
-    tmp_file = "/tmp/release_#{latest_tag}.tar.gz"
-    `curl -L -o #{tmp_file} #{asset_url}`
+rbenv_execute "app bundle install" do
+  command "bundle install --deployment --binstubs --without=development test"
+  cwd     "#{node.applications[:dir]}/#{node.applications[:app][:name]}"
+  user    node.applications[:user]
+  group   node.applications[:user]
 
-    #unpacking file to main directory #{node.applications[:dir]}/#{node.applications[:app][:name]}/
-    latest_release_dir = "#{node.applications[:dir]}/#{node.applications[:app][:name]}/release_#{latest_tag}"
-    `mkdir #{latest_release_dir}`
-
-    `tar -xzf #{tmp_file} -C #{latest_release_dir}`
-
-    #delete old symlink to previous latest version
-    `rm #{node.applications[:dir]}/#{node.applications[:app][:name]}/public`
-
-    #create new symlink to latest version
-    `ln -s #{latest_release_dir}/www #{node.applications[:dir]}/#{node.applications[:app][:name]}/public`
+  only_if do
+    changed?('Gemfile', 'Gemfile.lock', application: :app) ||
+    ! File.exists?("#{node.applications[:app][:dir]}/#{node.applications[:app][:name]}/vendor/bundle")
   end
 end
 
+rbenv_execute "run migrations" do
+  command "bundle exec rake db:migrate RAILS_ENV=#{node.applications[:app][:environment]}"
 
-# Create PickwickApp nginx config
+  cwd     "#{node.applications[:dir]}/#{node.applications[:app][:name]}"
+  user    node.applications[:user]
+  group   node.applications[:user]
+end
+
+# Create puma config
+#
+template "#{node.applications[:dir]}/#{node.applications[:app][:name]}/config/puma.rb" do
+  source "pickwick-app.puma.erb"
+  owner node.applications[:user] and group node.applications[:user] and mode 0755
+end
+
+monitrc "pickwick-app" do
+  template_cookbook "applications"
+end
+
+bash "restart application" do
+  code "monit restart #{node.applications[:app][:name]}-puma"
+  only_if { node.applications[:app][:current_revision] != node.applications[:app][:previous_revision] }
+end
+
+# Create nginx config
 #
 template "#{node.nginx[:dir]}/conf.d/#{node.applications[:app][:name]}.conf" do
   source "pickwick-app.nginx.erb"
   owner node.nginx[:user] and group node.nginx[:user] and mode 0755
   notifies :reload, 'service[nginx]'
 end
-

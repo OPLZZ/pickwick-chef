@@ -1,0 +1,17 @@
+#!/usr/bin/env puma
+
+environment '<%= node.applications[:app][:environment] %>'
+
+daemonize true
+
+pidfile '<%= node.applications[:app][:puma][:directories][:pids] %>/<%= node.applications[:app][:name] %>.pid'
+
+stdout_redirect '<%= node.applications[:dir] %>/<%= node.applications[:app][:name] %>/log/stderr.log',
+                '<%= node.applications[:dir] %>/<%= node.applications[:app][:name] %>/log/stdout.log',
+                true
+
+threads <%= node.applications[:app][:puma][:threads][:min] %>, <%= node.applications[:app][:puma][:threads][:max] %>
+
+bind 'unix://<%= node.applications[:app][:puma][:directories][:sockets] %>/<%= node.applications[:app][:name] %>.sock'
+
+workers 1

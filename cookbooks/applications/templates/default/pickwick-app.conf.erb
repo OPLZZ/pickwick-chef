@@ -1,0 +1,7 @@
+check process <%= node.applications[:app][:name] %>-puma with pidfile <%= node.applications[:app][:puma][:directories][:pids] %>/<%= node.applications[:app][:name] %>.pid
+  start program = "/bin/su - <%= node.applications[:user] %> -c 'cd <%= node.applications[:dir] %>/<%= node.applications[:app][:name] %> && RUBY_GC_MALLOC_LIMIT=<%= node.applications[:ruby_gc_malloc_limit] %> PICKWICK_API_URL=<%= node.applications[:app][:api][:url] %> PICKWICK_API_TOKEN=<%= node.applications[:app][:api][:token] %> PICKWICK_ADMIN_USERNAME=<%= node.applications[:app][:admin][:username] %> PICKWICK_ADMIN_PASSWORD=<%= node.applications[:app][:admin][:password] %> bundle exec puma --config config/puma.rb'" with timeout <%= node.applications[:app][:puma][:wait] %> seconds
+  stop program = "/bin/su - <%= node.applications[:user] %> -c 'kill -9 `cat <%= node.applications[:app][:puma][:directories][:pids] %>/<%= node.applications[:app][:name] %>.pid` && rm <%= node.applications[:app][:puma][:directories][:pids] %>/<%= node.applications[:app][:name] %>.pid'"
+
+  if totalmem > 95% for 15 cycles then restart
+
+  group <%= node.applications[:app][:name] %>_puma
