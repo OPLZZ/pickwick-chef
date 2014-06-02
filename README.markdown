@@ -147,7 +147,7 @@ Please note that this deployment option is for _development purposes only_ and i
 
 Please note that deployment is not fully tested yet.
 
-To build the stack in Amazon EC2, in addition to previouse credentials, you need to export the path to your private SSH key, downloaded from the AWS console:
+To build the stack in Amazon EC2, in addition to previous credentials, you need to export the path to your private SSH key, downloaded from the AWS console:
 
     export SSH_IDENTITY_FILE='/path/to/your/name-ec2.pem'
 
