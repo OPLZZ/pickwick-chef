@@ -3,6 +3,9 @@
     "build-essential": {
       "locked_version": "1.4.0"
     },
+    "yum": {
+      "locked_version": "2.4.4"
+    },
     "apt": {
       "locked_version": "2.3.4"
     },
@@ -28,7 +31,7 @@
       "locked_version": "1.7.0"
     },
     "redisio": {
-      "locked_version": "1.7.0"
+      "locked_version": "1.7.1"
     },
     "java": {
       "locked_version": "1.17.2"
@@ -40,9 +43,6 @@
     },
     "dmg": {
       "locked_version": "2.0.4"
-    },
-    "yum": {
-      "locked_version": "3.0.2"
     },
     "windows": {
       "locked_version": "1.11.0"
@@ -66,7 +66,7 @@
       "locked_version": "1.2.0"
     },
     "ark": {
-      "locked_version": "0.4.0"
+      "locked_version": "0.5.0"
     }
   }
 }
