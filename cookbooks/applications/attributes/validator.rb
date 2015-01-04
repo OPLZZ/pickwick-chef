@@ -5,7 +5,7 @@ default.applications[:validator][:url]            = 'job-posting-validator.dev.v
 default.applications[:validator][:port]           = 80
 default.applications[:validator][:environment]    = 'production'
 
-default.applications[:validator][:fuseki][:version] = "1.0.1"
+default.applications[:validator][:fuseki][:version] = "1.0.2"
 
 default.applications[:validator][:puma][:threads][:min]         = 1
 default.applications[:validator][:puma][:threads][:max]         = 3
