@@ -63,7 +63,7 @@ when 'AMAZON'
 
   knife[:aws_access_key_id]     = ENV['AWS_ACCESS_KEY_ID']
   knife[:aws_secret_access_key] = ENV['AWS_SECRET_ACCESS_KEY']
-  knife[:aws_ssh_key_id]        = "#{ENV['CHEF_ORGANIZATION']}-ec2"
+  knife[:aws_ssh_key_id]        = "#{ENV['CHEF_ORGANIZATION']}-aws"
   knife[:region]                = ENV['AWS_REGION'] || 'us-east-1'
   knife[:image]                 = 'ami-aecd60c7' # (Amazon Linux 2012.03)
   knife[:ssh_user]              = 'ec2-user'
