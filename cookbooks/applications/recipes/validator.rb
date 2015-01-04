@@ -116,6 +116,8 @@ end
 
 bash "restart application" do
   code "monit restart #{node.applications[:validator][:name]}-puma"
+
+  only_if "monit monitor #{node.applications[:validator][:name]}-puma"
   only_if { node.applications[:validator][:current_revision] != node.applications[:validator][:previous_revision] }
 end
 

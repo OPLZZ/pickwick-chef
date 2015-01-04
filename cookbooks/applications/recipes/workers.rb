@@ -85,11 +85,15 @@ end
 
 bash "restart sidekiq" do
   code "monit restart #{node.applications[:workers][:name]}-sidekiq"
+
+  only_if "monit monitor #{node.applications[:workers][:name]}-sidekiq"
   only_if { node.applications[:workers][:current_revision] != node.applications[:workers][:previous_revision] }
 end
 
 bash "restart sidekiq web" do
   code "monit restart #{node.applications[:workers][:name]}-puma"
+
+  only_if "monit monitor #{node.applications[:workers][:name]}-puma"
   only_if { node.applications[:workers][:current_revision] != node.applications[:workers][:previous_revision] }
 end
 

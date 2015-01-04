@@ -95,6 +95,8 @@ end
 
 bash "restart application" do
   code "monit restart #{node.applications[:api][:name]}-puma"
+
+  only_if "monit monitor #{node.applications[:api][:name]}-puma"
   only_if { node.applications[:api][:current_revision] != node.applications[:api][:previous_revision] }
 end
 
