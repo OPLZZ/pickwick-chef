@@ -11,3 +11,8 @@ default.applications[:workers][:puma][:threads][:max]         = 6
 default.applications[:workers][:puma][:directories][:sockets] = "/var/run/puma/sockets"
 default.applications[:workers][:puma][:directories][:pids]    = "/var/run/puma/pids"
 default.applications[:workers][:puma][:wait]                  = 120
+
+# api variables are currently overridden by role
+#
+default.applications[:workers][:api][:url]   = nil
+default.applications[:workers][:api][:token] = nil
