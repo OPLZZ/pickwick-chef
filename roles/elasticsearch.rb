@@ -30,7 +30,9 @@ attributes = {
 
 if ENV["PROVIDER"] == "AMAZON"
   attributes[:elasticsearch][:discovery] = { type: "ec2" }
-  attributes[:elasticsearch][:cloud]     = { aws: { access_key: ENV["AWS_ACCESS_KEY_ID"], secret_key: ENV["AWS_SECRET_ACCESS_KEY"] },
+  attributes[:elasticsearch][:cloud]     = { aws: { access_key: ENV["AWS_ACCESS_KEY_ID"],
+                                                    secret_key: ENV["AWS_SECRET_ACCESS_KEY"],
+                                                    region:     ENV["AWS_REGION"] },
                                              ec2: { security_group: "elasticsearch" }}
 end
 
