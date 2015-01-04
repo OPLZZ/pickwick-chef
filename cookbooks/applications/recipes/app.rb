@@ -2,7 +2,11 @@
 #
 include_recipe "applications::ruby"
 
-["sqlite3", "libsqlite3-dev", "libcurl4-openssl-dev"].each do |pkg|
+packages = value_for_platform_family "debian"  => ["sqlite3", "libsqlite3-dev", "libcurl4-openssl-dev"],
+                                     "rhel"    => ["sqlite", "sqlite-devel", "openssl-devel", "libcurl-devel"],
+                                     "default" => []
+
+packages.each do |pkg|
   package pkg
 end
 
