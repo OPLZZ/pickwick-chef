@@ -7,7 +7,9 @@ run_list    "recipe[build-essential]",
 
 override_attributes(
   monit: {
-    username: ENV['MONIT_USER'],
-    password: ENV['MONIT_PASSWORD']
+    http_auth: {
+      username: ENV['MONIT_USER'],
+      password: ENV['MONIT_PASSWORD']
+    }
   }
 )
