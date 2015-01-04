@@ -71,7 +71,6 @@ when 'AMAZON'
   knife[:use_sudo]              = true
   knife[:ssh_identity_file]     = ENV['SSH_IDENTITY_FILE']
   knife[:no_host_key_verify]    = true
-  knife[:bootstrap_version]     = 'latest'
 
 # NOTE: Just for testing, this option will be removed in future
 #
@@ -94,6 +93,4 @@ when 'PVE'
   knife[:pve_user_realm]        = ENV['PVE_USER_REALM']
 end
 
-
-
-
+knife[:bootstrap_version]     = '11.6.2'
