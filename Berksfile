@@ -30,4 +30,4 @@ cookbook 'redisio', '1.7.1'
 # Search
 #------------------------------------------------------------------------------
 cookbook 'java'
-cookbook 'elasticsearch', git: 'https://github.com/elasticsearch/cookbook-elasticsearch'
+cookbook 'elasticsearch', git: 'https://github.com/elasticsearch/cookbook-elasticsearch', ref: '0bd966d1aa27ab281b216676672b98e205d28d1e'

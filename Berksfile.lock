@@ -39,7 +39,7 @@
     "elasticsearch": {
       "locked_version": "0.3.7",
       "git": "https://github.com/elasticsearch/cookbook-elasticsearch",
-      "ref": "e89d3ef6762847f4088dbbfc9b439a7274265399"
+      "ref": "0bd966d1aa27ab281b216676672b98e205d28d1e"
     },
     "dmg": {
       "locked_version": "2.0.4"
