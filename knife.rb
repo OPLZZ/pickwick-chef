@@ -65,7 +65,7 @@ when 'AMAZON'
   knife[:aws_secret_access_key] = ENV['AWS_SECRET_ACCESS_KEY']
   knife[:aws_ssh_key_id]        = "#{ENV['CHEF_ORGANIZATION']}-aws"
   knife[:region]                = ENV['AWS_REGION'] || 'us-east-1'
-  knife[:image]                 = 'ami-aecd60c7' # (Amazon Linux 2012.03)
+  knife[:image]                 = 'ami-9d23aeea' # (Amazon Linux 2014.09)
   knife[:ssh_user]              = 'ec2-user'
   knife[:ssh_attribute]         = 'ec2.public_hostname'
   knife[:use_sudo]              = true
