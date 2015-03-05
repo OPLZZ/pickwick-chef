@@ -77,6 +77,8 @@ rbenv_execute "stop fuseki server" do
   cwd     "#{node.applications[:dir]}/#{node.applications[:validator][:name]}"
   user    node.applications[:user]
   group   node.applications[:user]
+
+  only_if { File.exists?("#{node.applications[:dir]}/#{node.applications[:validator][:name]}/tmp/pids/fuseki.pid") }
 end
 
 rbenv_execute "import background data" do
