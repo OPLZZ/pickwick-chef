@@ -52,19 +52,21 @@ You need to export the following environment variables for the provisioning scri
     export NGINX_PASSWORD='<nginx user password>'
     export MONIT_USER='<monit username>'
     export MONIT_PASSWORD='<monit user password>'
+    export MONIT_ALERT_EMAIL='<email for alerts>'
+    export MONIT_FROM_EMAIL='<email from>'
+    export MONIT_SMTP_SERVER='<smtp server>'
+    export MONIT_SMTP_PORT='<smtp port>'
+    export MONIT_SMTP_USER='<smtp username>'
+    export MONIT_SMTP_PASSWORD='<smtp password>'
+    export PICKWICK_API_URL='<url of API>'
+    export PICKWICK_API_TOKEN='<read only API token>'
+    export PICKWICK_API_RW_TOKEN='<API token>'
+    export PICKWICK_ADMIN_USERNAME='<admin username>'
+    export PICKWICK_ADMIN_PASSWORD='<admin password>'
+    export SIDEKIQ_USERNAME='<sidekiq username>'
+    export SIDEKIQ_PASSWORD='<sidekiq password>'
 
-### Proxmox Virtual Environment
-
-To build the stack in _Proxmox Virtual Environment_ you need to specify, in addition to previous environment variables, following variables:
-
-    export PVE_NODE_NAME='<your node name>'
-    export PVE_CLUSTER_URL='<your node cluster url>'
-    export PVE_USER_NAME='<your node user name>'
-    export PVE_USER_PASSWORD='<your node user password>'
-    export PVE_USER_REALM='<your node user realm, for example pve>'
-
-For test deploy in Proxmox Virtual Environment server run something like:
-    export PROVIDER=PVE
+### Installation
 
     git clone https://github.com/OPLZZ/pickwick-chef.git
     cd pickwick-chef
@@ -75,178 +77,62 @@ For test deploy in Proxmox Virtual Environment server run something like:
 
 ... install the site cookbooks with [Berkshelf](http://berkshelf.com):
 
-    berks install --path ./site-cookbooks/
+    berks vendor ./site-cookbooks/
 
 ... upload the cookbooks and roles to Chef Server:
 
     bundle exec rake chef:sync
 
-... build API server
+... build server
 
-    bundle exec knife proxmox server create --hostname pickwick-api \
-                                            --cpus 2 \
-                                            --mem 2048 \
-                                            --swap 0 \
-                                            --disk 20 \
-                                            --template TEMPLATE_ID \
-                                            --ipaddress IP \
-                                            --run-list "role[api]" \
-                                            --distro debian
+### DigitalOcean preparation
 
-... build workers server
+... create `~/.ssh/digitalocean-damepraci` using ssh-keygen
 
-    bundle exec knife proxmox server create --hostname pickwick-workers \
-                                            --cpus 2 \
-                                            --mem 2048 \
-                                            --swap 0 \
-                                            --disk 20 \
-                                            --template TEMPLATE_ID \
-                                            --ipaddress IP \
-                                            --run-list "role[workers]" \
-                                            --distro debian
+... set environment variable to public key
 
-... build frontend server
+```
+export SSH_PUBLIC_FILE=~/.ssh/digitalocean-damepraci.pub
+export SSH_IDENTITY_FILE=~/.ssh/digitalocean-damepraci
+```
 
-    bundle exec knife proxmox server create --hostname pickwick-app \
-                                            --cpus 2 \
-                                            --mem 512 \
-                                            --swap 0 \
-                                            --disk 20 \
-                                            --template TEMPLATE_ID \
-                                            --ipaddress IP \
-                                            --run-list "role[app]" \
-                                            --distro debian
+... add ssh key to digitalocean account
+```
+bundle exec knife digital_ocean sshkey create --sshkey-name digitalocean-damepraci \
+                                              --public-key $SSH_PUBLIC_FILE
+```
 
-... build validator server
+... get ssh key id
+```
+export SSH_KEY_ID=$(bundle exec knife digital_ocean sshkey list | grep digitalocean-damepraci | cut -d' ' -f1)
+```
 
-    bundle exec knife proxmox server create --hostname pickwick-validator \
-                                            --cpus 2 \
-                                            --mem 2048 \
-                                            --swap 0 \
-                                            --disk 20 \
-                                            --template TEMPLATE_ID \
-                                            --ipaddress IP \
-                                            --run-list "role[validator]" \
-                                            --distro debian
-
-... or you can create server with all parts of the infrastructure
-
-    bundle exec knife proxmox server create --hostname pickwick \
-                                            --cpus 4 \
-                                            --mem 8192 \
-                                            --swap 0 \
-                                            --disk 20 \
-                                            --template TEMPLATE_ID \
-                                            --ipaddress IP \
-                                            --run-list "role[api],role[workers],role[validator],role[app]" \
-                                            --distro debian
-
-Please note that this deployment option is for _development purposes only_ and it _will be deleted in the near future_.
-
-### Amazon EC2
-
-Please note that deployment is not fully tested yet.
-
-To build the stack in Amazon EC2, in addition to previous credentials, you need to export the path to your private SSH key, downloaded from the AWS console:
-
-    export SSH_IDENTITY_FILE='/path/to/your/name-ec2.pem'
-
-and set provider to Amazon by following environment variable
-
-    export PROVIDER=AMAZON
-
-You also need to create the following security groups:
-
-* elasticsearch with ports 9200 and 9300 opened to the api and elasticsearch groups, 2812 opened to the outside world
-* api with ports 80 and 2812 opened to the outside world
-* workers with port 2812 opened to the outside world
-* frontend with ports 80 and 2812 opened to the outside world
-* validator with ports 80 and 2812 opened to the outside world
-
-After that you can clone this repository, install required rubygems, install cookbooks, upload cookbooks to the Chef Server and create server(s).
-
-git clone https://github.com/OPLZZ/pickwick-chef.git
-    cd pickwick-chef
-
-... install the required rubygems:
-
-    bundle install
-
-... install the site cookbooks with [Berkshelf](http://berkshelf.com):
-
-    berks install --path ./site-cookbooks/
-
-... upload the cookbooks and roles to Chef Server:
-
-    bundle exec rake chef:sync
-
-... build API server
-
-    bundle exec knife ec2 server create --node-name pickwick-api \
-                                        --tags Role=api \
-                                        --ssh-user ec2-user \
-                                        --groups api \
-                                        --image ami-8fb7b2fb
-                                        --flavor m1.medium
-                                        --region eu-west-1
-                                        --availability-zone eu-west-1a \
-                                        --distro amazon \
-                                        --run-list 'role[api]'
-
-... build workers server
-
-    bundle exec knife ec2 server create --node-name pickwick-workers \
-                                        --tags Role=workers \
-                                        --ssh-user ec2-user \
-                                        --groups workers \
-                                        --image ami-8fb7b2fb
-                                        --flavor m1.small
-                                        --region eu-west-1
-                                        --availability-zone eu-west-1a \
-                                        --distro amazon \
-                                        --run-list 'role[workers]'
-
-... build frontend server
-
-    bundle exec knife ec2 server create --node-name pickwick-app \
-                                        --tags Role=app \
-                                        --ssh-user ec2-user \
-                                        --groups frontend \
-                                        --image ami-8fb7b2fb
-                                        --flavor m1.small
-                                        --region eu-west-1
-                                        --availability-zone eu-west-1a \
-                                        --distro amazon \
-                                        --run-list 'role[app]'
-
-... build validator server
-
-    bundle exec knife ec2 server create --node-name pickwick-validator \
-                                        --tags Role=validator \
-                                        --ssh-user ec2-user \
-                                        --groups validator \
-                                        --image ami-8fb7b2fb
-                                        --flavor m1.small
-                                        --region eu-west-1
-                                        --availability-zone eu-west-1a \
-                                        --distro amazon \
-                                        --run-list 'role[validator]'
-
-... or you can create server with all parts of the infrastructure
-
-    bundle exec knife ec2 server create --node-name pickwick \
-                                        --tags Role=app \
-                                        --ssh-user ec2-user \
-                                        --groups api,workers,validator,app \
-                                        --image ami-8fb7b2fb
-                                        --flavor m3.large
-                                        --region eu-west-1
-                                        --availability-zone eu-west-1a \
-                                        --distro amazon \
-                                        --run-list 'role[api],role[workers],role[validator],role[app]'
-
+... create droplet
+```
+bundle exec knife digital_ocean droplet create --server-name damepraci.cz \
+                                               --image debian-7-x64 \
+                                               --location fra1 \
+                                               --size 2gb \
+                                               --ssh-keys $SSH_KEY_ID \
+                                               --bootstrap \
+                                               --distro debian \
+                                               --ssh-port 22 \
+                                               --identity-file $SSH_IDENTITY_FILE
+```
 ----
 
-##Funding
+... create volume named `damepraci.cz` using DigitalOcean UI and attach it to the damepraci.cz droplet
+
+... add desired role to the node
+```
+bundle exec knife node run_list add damepraci.cz "role[whole_stack]"
+```
+
+... run chef-client again
+```
+knife ssh "name:damepraci.cz" -a ipaddress -x root --identity-file $SSH_IDENTITY_FILE chef-client
+```
+
+## Funding
 <a href="http://esfcr.cz/" target="_blank"><img src="http://novamedia.ff.cuni.cz/system/files/oplzz_banner_en.png" alt="Project of Operational Programme Human Resources and Employment No. CZ.1.04/5.1.01/77.00440."></a>
 The project No. CZ.1.04/5.1.01/77.00440 was funded from the European Social Fund through the Operational Programme Human Resources and Employment and the state budget of Czech Republic.
