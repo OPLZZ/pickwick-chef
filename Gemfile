@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
 
-gem "berkshelf", "2.0.18"
+gem "berkshelf"
 
-gem "chef"
+gem "json", "1.8.3"
+gem "chef", "11.18.12"
 gem "rake"
-gem "knife-ec2"
-gem "knife-proxmox"
+gem "knife-digital_ocean", "2.5.0"
