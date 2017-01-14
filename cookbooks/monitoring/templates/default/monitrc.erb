@@ -11,4 +11,26 @@ set httpd port 2812
   allow localhost
 <%- end %>
 
+<% if node['monit']['alert_email'] %>
+  set alert <%= node["monit"]["alert_email"] %>
+<%- end -%>
+
+set mailserver <%= node["monit"]["mail"]["hostname"] %> port <%= node["monit"]["mail"]["port"] %>
+  <% if node["monit"]["mail"]["username"] -%>
+  username "<%= node["monit"]["mail"]["username"] %>"
+  <% end -%>
+  <% if node["monit"]["mail"]["password"] -%>
+  password "<%= node["monit"]["mail"]["password"] %>"
+  <% end -%>
+<% if node["monit"]["mail"]["security"] -%>
+    using <%= node["monit"]["mail"]["security"] %>
+<% end -%>
+  with timeout <%= node["monit"]["mail"]["timeout"] %> seconds
+
+set mail-format {
+  from: <%= node["monit"]["mail"]["from"] %>
+  subject: <%= node["monit"]["mail"]["subject"] %>
+  message: <%= node["monit"]["mail"]["message"] %>
+}
+
 include /etc/monit/conf.d/*.conf
