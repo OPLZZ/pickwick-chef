@@ -39,7 +39,13 @@ check_environment_variable 'NGINX_USER'
 check_environment_variable 'NGINX_PASSWORD'
 check_environment_variable 'MONIT_USER'
 check_environment_variable 'MONIT_PASSWORD'
-check_environment_variable 'PROVIDER', 'You need to specify desired PROVIDER. Available options are AMAZON | PVE (just for testing)'
+check_environment_variable 'PICKWICK_API_URL'
+check_environment_variable 'PICKWICK_API_TOKEN'
+check_environment_variable 'PICKWICK_API_RW_TOKEN'
+check_environment_variable 'PICKWICK_ADMIN_USERNAME'
+check_environment_variable 'PICKWICK_ADMIN_PASSWORD'
+check_environment_variable 'SIDEKIQ_USERNAME'
+check_environment_variable 'SIDEKIQ_PASSWORD'
 
 current_dir = File.dirname(__FILE__)
 
@@ -55,42 +61,7 @@ cache_options            :path => "#{current_dir}/.chef/tmp/checksums"
 
 cookbook_path            ["#{current_dir}/site-cookbooks", "#{current_dir}/cookbooks"]
 
-case ENV['PROVIDER'].to_s
-when 'AMAZON'
-  check_environment_variable 'AWS_ACCESS_KEY_ID'
-  check_environment_variable 'AWS_SECRET_ACCESS_KEY'
-  check_environment_variable 'SSH_IDENTITY_FILE'
-
-  knife[:aws_access_key_id]     = ENV['AWS_ACCESS_KEY_ID']
-  knife[:aws_secret_access_key] = ENV['AWS_SECRET_ACCESS_KEY']
-  knife[:aws_ssh_key_id]        = "#{ENV['CHEF_ORGANIZATION']}-aws"
-  knife[:region]                = ENV['AWS_REGION'] || 'us-east-1'
-  knife[:image]                 = 'ami-9d23aeea' # (Amazon Linux 2014.09)
-  knife[:ssh_user]              = 'ec2-user'
-  knife[:ssh_attribute]         = 'ec2.public_hostname'
-  knife[:use_sudo]              = true
-  knife[:ssh_identity_file]     = ENV['SSH_IDENTITY_FILE']
-  knife[:no_host_key_verify]    = true
-
-# NOTE: Just for testing, this option will be removed in future
-#
-when 'PVE'
-  check_environment_variable 'PVE_NODE_NAME'
-  check_environment_variable 'PVE_CLUSTER_URL'
-  check_environment_variable 'PVE_USER_NAME'
-  check_environment_variable 'PVE_USER_PASSWORD'
-  check_environment_variable 'PVE_USER_REALM'
-
-  knife[:ssh_user]              = ENV['USER']
-  knife[:use_sudo]              = true
-  knife[:ssh_identity_file]     = "#{ENV['HOME']}/.ssh/#{ENV['USER']}-virtual"
-  knife[:no_host_key_verify]    = true
-
-  knife[:pve_node_name]         = ENV['PVE_NODE_NAME']
-  knife[:pve_cluster_url]       = ENV['PVE_CLUSTER_URL']
-  knife[:pve_user_name]         = ENV['PVE_USER_NAME']
-  knife[:pve_user_password]     = ENV['PVE_USER_PASSWORD']
-  knife[:pve_user_realm]        = ENV['PVE_USER_REALM']
-end
+check_environment_variable 'DIGITAL_OCEAN_ACCESS_TOKEN'
+knife[:digital_ocean_access_token] = ENV['DIGITAL_OCEAN_ACCESS_TOKEN']
 
 knife[:bootstrap_version]     = '11.6.2'

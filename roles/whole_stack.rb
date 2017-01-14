@@ -2,51 +2,36 @@ name        "whole_stack"
 description "Whole Damepraci stack on one EC2 server"
 
 run_list    "role[elasticsearch]",
-            "recipe[elasticsearch::aws]",
-            "recipe[elasticsearch::ebs]",
             "recipe[elasticsearch::data]",
             "role[api]",
             "role[workers]",
-            "role[validator]",
             "role[app]"
 
 override_attributes(
+  firewall: {
+    rules: [
+      { http: { port: 80 } },
+      { https: { port: 443 } },
+      { monit: { port: 2812 } },
+      { elasticsearch: { port: 8080 } }
+    ]
+  },
   elasticsearch: {
-    allocated_memory: "2048m",
-    discovery: {
-      type: "ec2"
-    },
-    cloud: {
-      aws: {
-        access_key: ENV["AWS_ACCESS_KEY_ID"],
-        secret_key: ENV["AWS_SECRET_ACCESS_KEY"],
-        region:     ENV["AWS_REGION"]
-      },
-      ec2: {
-        security_group: "elasticsearch"
-      }
-    },
+    allocated_memory: "512m",
     plugins: {
-      "elasticsearch/elasticsearch-cloud-aws" => { "version" => "2.0.0" },
-      "karmi/elasticsearch-paramedic"         => {} 
+      "karmi/elasticsearch-paramedic" => {} 
     },
     path: {
       data: "/usr/local/var/data/elasticsearch/disk1"
     },
     data: {
       devices: {
-        :"/dev/xvdb" => {
-          file_system:      "ext3",
+        :"/dev/disk/by-id/scsi-0DO_Volume_damepraci" => {
+          file_system:      "ext4",
           mount_options:    "rw,user",
           mount_path:       "/usr/local/var/data/elasticsearch/disk1",
-          format_command:   "mkfs.ext3",
-          fs_check_command: "dumpe2fs",
-          ebs: {
-            device:               '/dev/sda2',
-            size:                  20,
-            delete_on_termination: false,
-            type:                  "gp2"
-          }
+          format_command:   "mkfs.ext4 -F",
+          fs_check_command: "dumpe2fs"
         }
       }
     }
