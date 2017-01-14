@@ -1,72 +1,79 @@
-{
-  "sources": {
-    "build-essential": {
-      "locked_version": "1.4.0"
-    },
-    "yum": {
-      "locked_version": "2.4.4"
-    },
-    "apt": {
-      "locked_version": "2.3.4"
-    },
-    "curl": {
-      "locked_version": "1.1.0"
-    },
-    "vim": {
-      "locked_version": "1.0.2"
-    },
-    "git": {
-      "locked_version": "2.5.2"
-    },
-    "monit": {
-      "locked_version": "0.7.1"
-    },
-    "rbenv": {
-      "locked_version": "1.6.5"
-    },
-    "openssl": {
-      "locked_version": "1.1.0"
-    },
-    "nginx": {
-      "locked_version": "1.7.0"
-    },
-    "redisio": {
-      "locked_version": "1.7.1"
-    },
-    "java": {
-      "locked_version": "1.17.2"
-    },
-    "elasticsearch": {
-      "locked_version": "0.3.7",
-      "git": "https://github.com/elasticsearch/cookbook-elasticsearch",
-      "ref": "0bd966d1aa27ab281b216676672b98e205d28d1e"
-    },
-    "dmg": {
-      "locked_version": "2.0.4"
-    },
-    "windows": {
-      "locked_version": "1.11.0"
-    },
-    "chef_handler": {
-      "locked_version": "1.1.4"
-    },
-    "runit": {
-      "locked_version": "1.3.0"
-    },
-    "ohai": {
-      "locked_version": "1.1.12"
-    },
-    "ulimit": {
-      "locked_version": "0.3.2"
-    },
-    "aws": {
-      "locked_version": "0.101.6"
-    },
-    "xml": {
-      "locked_version": "1.2.0"
-    },
-    "ark": {
-      "locked_version": "0.5.0"
-    }
-  }
-}
+DEPENDENCIES
+  apt (= 2.3.4)
+  ark (= 0.5.0)
+  aws (= 0.101.6)
+  build-essential (= 1.4.0)
+  chef_handler (= 1.1.4)
+  curl (= 1.1.0)
+  dmg (= 2.0.4)
+  elasticsearch
+    git: https://github.com/elasticsearch/cookbook-elasticsearch
+    revision: 0bd966d1aa27ab281b216676672b98e205d28d1e
+    ref: 0bd966d
+  firewall (= 1.0.2)
+  git (= 2.5.2)
+  java (= 1.17.2)
+  monit (= 0.7.1)
+  nginx (= 1.7.0)
+  ohai (= 1.1.12)
+  openssl (= 1.1.0)
+  rbenv (= 1.6.5)
+  redisio (= 1.7.1)
+  runit (= 1.3.0)
+  ufw (= 0.7.4)
+  vim (= 1.0.2)
+  yum (= 2.4.4)
+
+GRAPH
+  apt (2.3.4)
+  ark (0.5.0)
+  aws (0.101.6)
+  build-essential (1.4.0)
+  chef_handler (1.1.4)
+  curl (1.1.0)
+  dmg (2.0.4)
+  elasticsearch (0.3.7)
+    ark (>= 0.2.4)
+    build-essential (>= 0.0.0)
+    java (>= 0.0.0)
+    monit (>= 0.0.0)
+    xml (>= 0.0.0)
+  firewall (1.0.2)
+    poise (~> 1.0)
+  git (2.5.2)
+    build-essential (>= 0.0.0)
+    dmg (>= 0.0.0)
+    runit (>= 1.0)
+    windows (>= 0.0.0)
+    yum (>= 0.0.0)
+  java (1.17.2)
+    aws (>= 0.0.0)
+    windows (>= 0.0.0)
+  monit (0.7.1)
+  nginx (1.7.0)
+    apt (>= 0.0.0)
+    build-essential (>= 0.0.0)
+    ohai (>= 1.1.4)
+    runit (>= 0.0.0)
+    yum (>= 0.0.0)
+  ohai (1.1.12)
+  openssl (1.1.0)
+  poise (1.0.12)
+  rbenv (1.6.5)
+    apt (>= 0.0.0)
+    build-essential (>= 0.0.0)
+    git (>= 0.0.0)
+    ohai (>= 1.1)
+  redisio (1.7.1)
+    ulimit (>= 0.1.2)
+  runit (1.3.0)
+    build-essential (>= 0.0.0)
+    yum (>= 0.0.0)
+  ufw (0.7.4)
+    firewall (>= 0.9.0)
+  ulimit (0.4.0)
+  vim (1.0.2)
+  windows (2.0.2)
+  xml (3.1.0)
+    build-essential (>= 0.0.0)
+  yum (2.4.4)
