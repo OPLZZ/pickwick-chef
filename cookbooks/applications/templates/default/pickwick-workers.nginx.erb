@@ -4,9 +4,21 @@ upstream <%= node.applications[:workers][:name] %> {
 
 server {
   listen 80;
+
+  server_name <%= node.applications[:workers][:url] %>;
+  return 301 https://<%= node.applications[:workers][:url] %>$request_uri;
+}
+
+server {
+  listen 443;
   server_name <%= node.applications[:workers][:url] %>;
 
   root <%= "#{node.applications[:dir]}/#{node.applications[:workers][:name]}" %>/public;
+
+  ssl on;
+  ssl_certificate /etc/nginx/certificate.crt;
+  ssl_certificate_key /etc/nginx/certificate.key;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 
   location / {
 

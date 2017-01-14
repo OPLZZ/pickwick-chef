@@ -2,23 +2,33 @@ upstream <%= node.applications[:app][:name] %> {
   server unix:<%= node.applications[:app][:puma][:directories][:sockets] %>/<%= node.applications[:app][:name] %>.sock;
 }
 
-
-<%- unless node.applications[:app][:url].start_with?("www") -%>
 server {
   listen 80;
+
+  <% if node.applications[:app][:url].start_with?("www") %>
   server_name <%= node.applications[:app][:url] %>;
-  return 301 http://www.<%= node.applications[:app][:url] %>$request_uri;
+  return 301 https://<%= node.applications[:app][:url] %>$request_uri;
+  <% else %>
+  server_name <%= node.applications[:app][:url] %> www.<%= node.applications[:app][:url] %>;
+  return 301 https://www.<%= node.applications[:app][:url] %>$request_uri;
+  <% end %>
 }
-<%- end -%>
 
 server {
-  listen 80;
+  listen 443;
+
   server_name <%= "www." unless node.applications[:app][:url].start_with?("www") %><%= node.applications[:app][:url] %>;
 
   root <%= "#{node.applications[:dir]}/#{node.applications[:app][:name]}" %>/public;
   client_max_body_size 500M;
 
+  ssl on;
+  ssl_certificate /etc/nginx/certificate.crt;
+  ssl_certificate_key /etc/nginx/certificate.key;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
   location / {
+    include /etc/nginx/mime.types;
 
     if ($request_uri ~* "\.(ico|css|js|gif|jpe?g|png)\?[0-9]+$") {
         expires max;

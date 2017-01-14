@@ -2,6 +2,22 @@
 #
 [Chef::Recipe, Chef::Resource].each { |l| l.send :include, GitChanged }
 
+ruby_block "save SSL certificate" do
+  block do
+    File.open("/etc/nginx/certificate.crt", "w") do |f|
+      f.write node.applications[:certificate][:ssl_certificate]
+    end
+
+    File.open("/etc/nginx/certificate.key", "w") do |f|
+      f.write node.applications[:certificate][:ssl_certificate_key]
+    end
+  end
+
+  not_if  { File.exists?("/etc/nginx/certificate.crt") || File.exists?("/etc/nginx/certificate.key") }
+  only_if { node.applications[:certificate][:ssl_certificate] && node.applications[:certificate][:ssl_certificate_key] }
+end
+
+
 # Create user directory
 #
 directory node.applications[:dir] do

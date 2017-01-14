@@ -4,12 +4,25 @@ upstream <%= node.applications[:api][:name] %> {
 
 server {
   listen 80;
+
+  server_name <%= node.applications[:api][:url] %>;
+  return 301 https://<%= node.applications[:api][:url] %>$request_uri;
+}
+
+server {
+  listen 443;
   server_name <%= node.applications[:api][:url] %>;
 
   root <%= "#{node.applications[:dir]}/#{node.applications[:api][:name]}" %>/public;
   client_max_body_size 500M;
 
+  ssl on;
+  ssl_certificate /etc/nginx/certificate.crt;
+  ssl_certificate_key /etc/nginx/certificate.key;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
   location / {
+    include /etc/nginx/mime.types;
 
     if ($request_uri ~* "\.(ico|css|js|gif|jpe?g|png)\?[0-9]+$") {
         expires max;
@@ -21,6 +34,7 @@ server {
 
     # needed for HTTPS
     proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header Host $http_host;
     proxy_redirect off;
     proxy_max_temp_file_size 0;
