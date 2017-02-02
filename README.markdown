@@ -134,5 +134,5 @@ knife ssh "name:damepraci.cz" -a ipaddress -x root --identity-file $SSH_IDENTITY
 ```
 
 ## Funding
-<a href="http://esfcr.cz/" target="_blank"><img src="http://novamedia.ff.cuni.cz/system/files/oplzz_banner_en.png" alt="Project of Operational Programme Human Resources and Employment No. CZ.1.04/5.1.01/77.00440."></a>
+<a href="http://esfcr.cz/" target="_blank"><img src="https://www.damepraci.cz/assets/oplzz_banner_en.png" alt="Project of Operational Programme Human Resources and Employment No. CZ.1.04/5.1.01/77.00440."></a>
 The project No. CZ.1.04/5.1.01/77.00440 was funded from the European Social Fund through the Operational Programme Human Resources and Employment and the state budget of Czech Republic.
