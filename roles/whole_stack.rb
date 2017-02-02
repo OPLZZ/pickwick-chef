@@ -16,6 +16,9 @@ override_attributes(
       { elasticsearch: { port: 8080 } }
     ]
   },
+  redisio: {
+    version: "2.8.23"
+  },
   elasticsearch: {
     allocated_memory: "512m",
     plugins: {
